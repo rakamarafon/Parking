@@ -10,7 +10,7 @@ namespace Parking
     {
         public static int Timeout { get; set; }
 
-        static Dictionary<CarType, int> priceDictionary;
+        public static Dictionary<CarType, int> priceDictionary;
         public static int ParkingSpace { get; set; }
         public static int Fine { get; set; }
 
