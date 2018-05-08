@@ -31,6 +31,7 @@ namespace Parking
             {
                 if (item.Key == car.Type) price = item.Value;
             }
+            TransactionList.Add(new Transaction() { TransactionDataTime = DateTime.Now, CarId = car.CarId, MoneyPaid = price});
             car.Balance -= price;
             Balance += price;
         }
@@ -59,5 +60,32 @@ namespace Parking
                 WriteOffByCar(ref car); 
             }
         }
+
+        public List<Transaction> GetTransactionsByLastMinute()
+        {
+            DateTime currentTime = DateTime.Now;
+            DateTime fromTIme = currentTime.AddMinutes(-1);
+            List<Transaction> returned_list = new List<Transaction>();
+            foreach (var item in TransactionList)
+            {
+                if (item.TransactionDataTime >= fromTIme) returned_list.Add(item);
+            }
+            return returned_list;
+        }
+
+        public int GetFreeSpaceOnParking()
+        {
+            return Settings.ParkingSpace - CarList.Count;
+        }
+
+        public void SaveTransactionToFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Transaction> GetTransactionLog()
+        {
+            throw new NotImplementedException();
+        }        
     }
 }

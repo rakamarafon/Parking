@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Parking
@@ -10,26 +11,27 @@ namespace Parking
     {
         static void Main(string[] args)
         {
-            Parking.Instance.AddCar(new Car() { CarId = 1, Type = CarType.Passenger, Balance = 10});
-            Parking.Instance.AddCar(new Car() { CarId = 2, Type = CarType.Motorcycle, Balance = 20 });
+            Parking.Instance.AddCar(new Car() { CarId = 1, Type = CarType.Passenger, Balance = 110});
+            Parking.Instance.AddCar(new Car() { CarId = 2, Type = CarType.Motorcycle, Balance = 120 });
             Parking.Instance.AddCar(new Car() { CarId = 3, Type = CarType.Truck, Balance = 100});
 
-            Parking.Instance.RemoveCar(2);
-
-            foreach (var item in Parking.Instance.CarList)
-            {
-                Console.WriteLine("id = {0} \n balance = {1} \n type = {2}", item.CarId, item.Balance, item.Type);
-                Console.WriteLine("----------------------------------------------------------------------------------");
-            }
-
+            Thread.Sleep(30 * 1000);
+            Parking.Instance.WriteOff();
+            Thread.Sleep(30 * 1000);
+            Parking.Instance.WriteOff();
+            Thread.Sleep(30 * 1000);
             Parking.Instance.WriteOff();
 
-            foreach (var item in Parking.Instance.CarList)
+            var temp = Parking.Instance.GetTransactionsByLastMinute();
+
+            foreach (var item in temp)
             {
-                Console.WriteLine("id = {0} \n balance = {1} \n type = {2}", item.CarId, item.Balance, item.Type);
+                Console.WriteLine("TransactionDataTime = {0} \n CarId = {1} \n MoneyPaid = {2}", item.TransactionDataTime, item.CarId, item.MoneyPaid);
                 Console.WriteLine("----------------------------------------------------------------------------------");
             }
-            Console.WriteLine("Parking balance = " + Parking.Instance.Balance);
+            Console.WriteLine("Free space on parking: {0}", Parking.Instance.GetFreeSpaceOnParking());
+            Console.WriteLine(Parking.Instance.Balance);
+            Console.ReadKey();
         }
     }
 }

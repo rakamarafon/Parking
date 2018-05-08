@@ -12,5 +12,9 @@ namespace Parking
         void RemoveCar(int car_id);
         void RefillCarBalance(int car_id, int sum_to_refill);
         void WriteOff();
+        List<Transaction> GetTransactionsByLastMinute();
+        int GetFreeSpaceOnParking();
+        void SaveTransactionToFile();
+        List<Transaction> GetTransactionLog();
     }
 }
