@@ -114,12 +114,13 @@ namespace Parking
         {
             using (StreamWriter sw = File.AppendText("Transaction.log"))
             {
+                int sum = 0;
                 foreach (var item in TransactionList)
                 {
-                    sw.WriteLine("Date \t \t \t CarID \t \t MoneyPaid \t \t");
-                    sw.WriteLine(String.Format("{0} \t {1} \t \t {2}", item.TransactionDataTime.ToString(),item.CarId.ToString(), item.MoneyPaid.ToString()));
-                    sw.WriteLine(new string('-', 100));
+                    sum += item.MoneyPaid;
                 }
+                sw.WriteLine("Date \t \t \t \tSumm ");
+                sw.WriteLine(String.Format("{0} \t \t {1}", DateTime.Now, sum));
             }
             TransactionList.Clear();
         }
