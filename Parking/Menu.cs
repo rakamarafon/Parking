@@ -155,6 +155,13 @@ namespace Parking
             }
             
         }
+        private void ShowTotalParkingIncome()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Total parking income is {0}",Parking.Instance.Balance);
+            Console.ResetColor();
+        }
         public void ShowMainMenu()
         {
             while (true)
@@ -166,6 +173,7 @@ namespace Parking
                 Console.WriteLine("4 - show list of cars on parking place");
                 Console.WriteLine("5 - show free space on parking place");
                 Console.WriteLine("6 - show log for last minute");
+                Console.WriteLine("7 - total parking income");
                 Console.WriteLine("q - Exit");
 
                 var input = Console.ReadKey();
@@ -190,8 +198,17 @@ namespace Parking
                     case '6':
                         ShowLogForLastMinute();
                         break;
+                    case '7':
+                        ShowTotalParkingIncome();
+                        break;
                     case 'q':
                         if(BeSureBeforeExit()) Environment.Exit(0);
+                        break;
+                    default:
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Incorect input");
+                        Console.ResetColor();
                         break;
                 }
             }

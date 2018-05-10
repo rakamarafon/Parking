@@ -26,6 +26,23 @@ namespace Parking
         {
             return CarList.Single<Car>(x => x.CarId == id);
         }
+
+        private int CalculatePrice(ref Car car, int price)
+        {
+            if (car.Balance > 0)
+            {
+                if (car.Balance < price)
+                {
+                    int temp = price - car.Balance;
+                    return (temp * Settings.Fine) + price;
+                }
+                return price;
+            }
+            else
+            {
+                return price * Settings.Fine;
+            }
+        }
         private void WriteOffByCar(ref Car car)
         {
             int price = 0;
@@ -34,7 +51,7 @@ namespace Parking
                 if (item.Key == car.Type) price = item.Value;
             }
             TransactionList.Add(new Transaction() { TransactionDataTime = DateTime.Now, CarId = car.CarId, MoneyPaid = price});
-            car.Balance -= price;
+            car.Balance -= CalculatePrice(ref car, price);
             Balance += price;
         }
 
