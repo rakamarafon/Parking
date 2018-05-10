@@ -11,6 +11,9 @@ namespace Parking
     {
         static void Main(string[] args)
         {
+            Parking.Instance.StartDay();
+            Menu menu = new Menu();
+            menu.ShowMainMenu();         
         }
     }
 }
