@@ -9,13 +9,12 @@ namespace Parking
     public interface IParkingPlace
     {
         void AddCar(Car car);
-        bool RemoveCar(int car_id);
+        int RemoveCar(int car_id);
         void RefillCarBalance(int car_id, int sum_to_refill);
         void WriteOff(object obj);
         List<Transaction> GetTransactionsByLastMinute();
         int GetFreeSpaceOnParking();
         void SaveTransactionToFile(object obj);
-        List<Transaction> GetTransactionLog();
         void StartDay();
     }
 }

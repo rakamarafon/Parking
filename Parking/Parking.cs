@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -42,17 +43,18 @@ namespace Parking
             CarList.Add(car);
         }
 
-        public bool RemoveCar(int car_id)
+        public int RemoveCar(int car_id)
         {
+            if (CarList.Count == 0) return 0;
             Car car = GetCarById(car_id);
             if(car.Balance < 0)
             {
-                return false;
+                return 1;
             }
             else
             {
                 CarList.Remove(car);
-                return true;
+                return 2;
             }            
         }
 
@@ -93,12 +95,16 @@ namespace Parking
 
         public void SaveTransactionToFile(object obj = null)
         {
-            Console.WriteLine("SaveTransactionToFile");
-        }
-
-        public List<Transaction> GetTransactionLog()
-        {
-            throw new NotImplementedException();
+            using (StreamWriter sw = File.AppendText("Transaction.log"))
+            {
+                foreach (var item in TransactionList)
+                {
+                    sw.WriteLine("Date \t \t \t CarID \t \t MoneyPaid \t \t");
+                    sw.WriteLine(String.Format("{0} \t {1} \t \t {2}", item.TransactionDataTime.ToString(),item.CarId.ToString(), item.MoneyPaid.ToString()));
+                    sw.WriteLine(new string('-', 100));
+                }
+            }
+            TransactionList.Clear();
         }
 
         public void StartDay()
@@ -106,8 +112,8 @@ namespace Parking
             TimerCallback writteOffCallback = new TimerCallback(WriteOff);
             TimerCallback SaveToFileCallback = new TimerCallback(SaveTransactionToFile);
 
-            Timer timerWritteOff = new Timer(writteOffCallback, null, 0, Settings.Timeout);
-            Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 0, 60 * 1000);
+            Timer timerWritteOff = new Timer(writteOffCallback, null,1000 * Settings.Timeout,1000 * Settings.Timeout);
+            Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 60 * 1000, 60 * 1000);
         }
     }
 }
