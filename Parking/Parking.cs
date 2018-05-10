@@ -19,7 +19,7 @@ namespace Parking
         {
             CarList = new List<Car>();
             TransactionList = new List<Transaction>();
-        }
+        } 
 
         private Car GetCarById(int id)
         {
