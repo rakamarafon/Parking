@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Parking
@@ -41,9 +42,18 @@ namespace Parking
             CarList.Add(car);
         }
 
-        public void RemoveCar(int car_id)
+        public bool RemoveCar(int car_id)
         {
-            CarList.Remove(GetCarById(car_id));
+            Car car = GetCarById(car_id);
+            if(car.Balance < 0)
+            {
+                return false;
+            }
+            else
+            {
+                CarList.Remove(car);
+                return true;
+            }            
         }
 
         public void RefillCarBalance(int car_id, int sum_to_refill)
@@ -52,13 +62,16 @@ namespace Parking
             car.Balance += sum_to_refill;
         }
 
-        public void WriteOff()
+        public void WriteOff(object obj = null)
         {
-            for(int i = 0; i < CarList.Count; i++)
+            if(CarList.Count > 0)
             {
-                Car car = CarList[i];
-                WriteOffByCar(ref car); 
-            }
+                for (int i = 0; i < CarList.Count; i++)
+                {
+                    Car car = CarList[i];
+                    WriteOffByCar(ref car);
+                }
+            }          
         }
 
         public List<Transaction> GetTransactionsByLastMinute()
@@ -78,14 +91,23 @@ namespace Parking
             return Settings.ParkingSpace - CarList.Count;
         }
 
-        public void SaveTransactionToFile()
+        public void SaveTransactionToFile(object obj = null)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("SaveTransactionToFile");
         }
 
         public List<Transaction> GetTransactionLog()
         {
             throw new NotImplementedException();
-        }        
+        }
+
+        public void StartDay()
+        {
+            TimerCallback writteOffCallback = new TimerCallback(WriteOff);
+            TimerCallback SaveToFileCallback = new TimerCallback(SaveTransactionToFile);
+
+            Timer timerWritteOff = new Timer(writteOffCallback, null, 0, Settings.Timeout);
+            Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 0, 60 * 1000);
+        }
     }
 }

@@ -15,12 +15,7 @@ namespace Parking
             Parking.Instance.AddCar(new Car() { CarId = 2, Type = CarType.Motorcycle, Balance = 120 });
             Parking.Instance.AddCar(new Car() { CarId = 3, Type = CarType.Truck, Balance = 100});
 
-            Thread.Sleep(30 * 1000);
-            Parking.Instance.WriteOff();
-            Thread.Sleep(30 * 1000);
-            Parking.Instance.WriteOff();
-            Thread.Sleep(30 * 1000);
-            Parking.Instance.WriteOff();
+            Parking.Instance.StartDay();
 
             var temp = Parking.Instance.GetTransactionsByLastMinute();
 
