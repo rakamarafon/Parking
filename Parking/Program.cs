@@ -10,6 +10,9 @@ namespace Parking
     {
         static void Main(string[] args)
         {
+            Menu menu = new Menu();
+            menu.ShowMainMenu();
+            Console.ReadKey();
         }
     }
 }
