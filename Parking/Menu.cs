@@ -11,6 +11,42 @@ namespace Parking
     {
         private readonly string MSG_FOR_ID = "ID";
         private readonly string MSG_FOR_BALANCE = "balance";
+        private void PrintMainMenu()
+        {
+            Console.WriteLine("1 - add new car to parking place");
+            Console.WriteLine("2 - remove car from parking place");
+            Console.WriteLine("3 - add balance  for car");
+            Console.WriteLine("4 - show list of cars on parking place");
+            Console.WriteLine("5 - show free space on parking place");
+            Console.WriteLine("6 - show busy space on parking place");
+            Console.WriteLine("7 - show log for last minute");
+            Console.WriteLine("8 - total parking income");
+            Console.WriteLine("9 - parking income by last minute");
+            Console.WriteLine("h - history from Transaction.log");
+            Console.WriteLine("q - Exit");
+        }
+        private void PrintPositiveMsg(string msg, string[] args = null)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(msg,args);
+            Console.ResetColor();
+        }
+        private void PrintNegativeMsg(string msg, string[] args = null)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(msg, args);
+            Console.ResetColor();
+        }
+        private void PrintInfoMsg(string msg, string[] args = null)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(msg, args);
+            Console.ResetColor();
+        }
+        private void AfterEachMsg()
+        {
+            Console.ResetColor();
+        }
         private void PrintLongLine(int count = 100)
         {
             Console.WriteLine(new string('-', count));
@@ -46,22 +82,22 @@ namespace Parking
             {
                 case '1':
                     Console.Clear();
-                    Console.WriteLine("type Passenger has been selected");
+                    PrintPositiveMsg("Type Passenger has been selected");
                     car.Type = CarType.Passenger;
                     break;
                 case '2':
                     Console.Clear();
-                    Console.WriteLine("type Truck has been selected");
+                    PrintPositiveMsg("Type Truck has been selected");
                     car.Type = CarType.Truck;
                     break;
                 case '3':
                     Console.Clear();
-                    Console.WriteLine("type Bus has been selected");
+                    PrintPositiveMsg("Type Bus has been selected");
                     car.Type = CarType.Bus;
                     break;
                 case '4':
                     Console.Clear();
-                    Console.WriteLine("type Motorcycle has been selected");
+                    PrintPositiveMsg("type Motorcycle has been selected");
                     car.Type = CarType.Motorcycle;
                     break;
                 case 'b':
@@ -107,7 +143,7 @@ namespace Parking
             Console.Clear();
             if(Parking.Instance.GetFreeSpaceOnParking() == Parking.Instance.ParkingSpace)
             {
-                Console.WriteLine("There are no cars on the parking place");
+                PrintNegativeMsg("There are no cars on the parking place");                
                 return;
             }
             Console.WriteLine("input car id");
@@ -119,19 +155,19 @@ namespace Parking
                 int res = Parking.Instance.RemoveCar(id);
                 if (res == 2)
                 {
-                    Console.WriteLine("car {0} was successfuly removed", id);
+                    PrintPositiveMsg("car with ID {0} was successfuly removed", new string[]{ id.ToString()});
                 }
                 else if (res == 1)
                 {
-                    Console.WriteLine("can't remove {0} car. Please raisee balance", id);
+                    PrintNegativeMsg("Can't remove car with ID {0}. Please raisee balance", new string[] { id.ToString()});
                 }
                 else if(res == 0)
                 {
-                    Console.WriteLine("there are no cars on the parking place");
+                    PrintNegativeMsg("There are no cars on the parking place");
                 }
                 else if(res == 3)
                 {
-                    Console.WriteLine("can not found car with this id");
+                    PrintNegativeMsg("Can not found car with ID {0}", new string[] { id.ToString()});
                 }
             }
             else
@@ -145,12 +181,12 @@ namespace Parking
             Console.Clear();
             if (Parking.Instance.CarList.Count == 0)
             {
-                Console.WriteLine("There are no cars on the parking place");
+                PrintInfoMsg("There are no cars on the parking place");
                 return;
             }
             foreach (var item in Parking.Instance.CarList)
             {
-                Console.WriteLine("CarId: {0}\tCarBalance: {1}\tCarType: {2}", item.CarId, item.Balance, item.Type);
+                Console.WriteLine("CarId: {0}\tCarBalance: {1}\t \t CarType: {2}", item.CarId, item.Balance, item.Type);
             }
             PrintLongLine();
         }
@@ -159,10 +195,10 @@ namespace Parking
             Console.Clear();
             if (Parking.Instance.GetFreeSpaceOnParking() == Parking.Instance.ParkingSpace)
             {
-                Console.WriteLine("There are no cars on the parking place");
+                PrintInfoMsg("There are no cars on the parking place");
                 return;
             }
-            Console.WriteLine("Please enter car id (click 'b' for back)");
+            Console.WriteLine("Please enter car ID (click 'b' for back)");
             string input = Console.ReadLine();
             if (input == "b") return;
             int id;
@@ -181,6 +217,8 @@ namespace Parking
                 return;
             }
             Parking.Instance.RefillCarBalance(id, sum);
+            Console.Clear();
+            PrintPositiveMsg("Sum {0} has been added to car ID {1}", new string[] {sum.ToString(),id.ToString()});
         }
         private bool BeSureBeforeExit()
         {
@@ -204,11 +242,11 @@ namespace Parking
             int space = Parking.Instance.GetFreeSpaceOnParking();
             if (space > 0)
             {
-                Console.WriteLine("There are {0} free spaces on the parking place", space);
+                PrintInfoMsg("There are {0} free spaces on the parking place", new string[] {space.ToString()});
             }
             else
             {
-                Console.WriteLine("There are no free space on the parking place");
+                PrintInfoMsg("There are no free space on the parking place");
             }
         }
         private void ShowLogForLastMinute()
@@ -224,28 +262,24 @@ namespace Parking
             }
             else
             {
-                Console.WriteLine("For the last minute there was no transaction");
+                PrintInfoMsg("For the last minute there was no transaction");
             }
             
         }
         private void ShowTotalParkingIncome()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Total parking income is {0}",Parking.Instance.TotalParkingProfit());
-            Console.ResetColor();
+            PrintPositiveMsg("Total parking income is {0}",new string[] { Parking.Instance.TotalParkingProfit().ToString()});
         }
         private void ShowParkingIncomeByLastMinute()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Parking income by last minute is {0}", Parking.Instance.ParkingProfitByLastMinute());
-            Console.ResetColor();
+            PrintPositiveMsg("Parking income by last minute is {0}", new string[] { Parking.Instance.ParkingProfitByLastMinute().ToString() });
         }
         private void ShowBusySpace()
         {
             Console.Clear();
-            Console.WriteLine("There are {0} busy place on parking", Parking.Instance.GetBusySpaceOnParking());
+            PrintInfoMsg("There are {0} busy place on parking", new string[] { Parking.Instance.GetBusySpaceOnParking().ToString()});
         }
         private void ShowTransactionLogFromFile()
         {
@@ -261,34 +295,29 @@ namespace Parking
             }  
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("The transaction file is not available\nLet's try again later");
-                Console.ResetColor();
+                PrintNegativeMsg("The transaction file is not available\nLet's try again later");
             }
         }
         public void ShowMainMenu()
         {
             while (true)
             {
-                Console.WriteLine("1 - add new car to parking place");
-                Console.WriteLine("2 - remove car from parking place");
-                Console.WriteLine("3 - add balance  for car");
-                Console.WriteLine("4 - show list of cars on parking place");
-                Console.WriteLine("5 - show free space on parking place");
-                Console.WriteLine("6 - show busy space on parking place");
-                Console.WriteLine("7 - show log for last minute");
-                Console.WriteLine("8 - total parking income");
-                Console.WriteLine("9 - parking income by last minute");
-                Console.WriteLine("h - history from Transaction.log");
-                Console.WriteLine("q - Exit");
-
+                PrintMainMenu();
                 var input = Console.ReadKey();
                 switch (input.KeyChar)
                 {
                     case '1':
                         Car car = AddNewCar();
-                        if (Parking.Instance.AddCar(car)) Console.WriteLine("car with ID:{0} was successfuly added", car.CarId);
-                            else Console.WriteLine("Car already in the parking lot");                              
+                        int code = Parking.Instance.AddCar(car);
+                        if (code == 2) PrintPositiveMsg("car with ID:{0} was successfuly added", new string[] { car.CarId.ToString()});
+                        else if (code == 4)
+                        {
+                            PrintNegativeMsg("In the parking lot there are no free places");
+                        }
+                        else if (code == 5)
+                        {
+                            PrintNegativeMsg("Car with ID:{0} already in the parking place", new string[] {car.CarId.ToString()});
+                        }
                         break;
                     case '2':
                         RemoveCar();

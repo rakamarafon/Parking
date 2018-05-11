@@ -12,7 +12,9 @@ namespace Parking
     {
         private static readonly Lazy<Parking> lazy = new Lazy<Parking>(() => new Parking());
         public static Parking Instance { get { return lazy.Value; } }
+        private object carListMonitor = new object();
         public List<Car> CarList { get; set; }
+        private object transactionListMonitor = new object();
         public List<Transaction> TransactionList { get; set; }
         public int Balance { get; set; }
         private enum ErrorsCod
@@ -20,7 +22,10 @@ namespace Parking
             EmptyList,
             MinusBalance,
             Success,
-            NoCar
+            NoCar,
+            FullParking,
+            ParkingHasCarWthThisID,
+            Error
         }
 
         public int ParkingSpace { get; private set; }
@@ -70,7 +75,7 @@ namespace Parking
                 return price * Fine;
             }
         }
-        private void WriteOffByCar(ref Car car)
+        private void WriteOffByCar(Car car)
         {
             int price = 0;
             foreach (var item in priceDictionary)
@@ -82,18 +87,19 @@ namespace Parking
             Balance += price;
         }
 
-        public bool AddCar(Car car)
+        public int AddCar(Car car)
         {
             if (car != null)
             {
+                if (CarList.Count >= ParkingSpace) return (int)ErrorsCod.FullParking;
                 foreach (var item in CarList)
                 {
-                    if (item.CarId == car.CarId) return false;
+                    if (item.CarId == car.CarId) return (int)ErrorsCod.ParkingHasCarWthThisID;
                 }
                 CarList.Add(car);
-                return true;
+                return (int)ErrorsCod.Success;
             }
-            return false;
+            return (int)ErrorsCod.Error;
         }
 
         public int RemoveCar(int car_id)
@@ -119,15 +125,17 @@ namespace Parking
         }
 
         public void WriteOff(object obj = null)
-        {
-            if(CarList.Count > 0)
+        {           
+            lock(carListMonitor)
             {
-                for (int i = 0; i < CarList.Count; i++)
+                if (CarList.Count > 0)
                 {
-                    Car car = CarList[i];
-                    WriteOffByCar(ref car);
+                    for (int i = 0; i < CarList.Count; i++)
+                    {
+                        WriteOffByCar(CarList[i]);
+                    }
                 }
-            }          
+            }               
         }
 
         public List<Transaction> GetTransactionsByLastMinute()
@@ -148,17 +156,24 @@ namespace Parking
         }
 
         public void SaveTransactionToFile(object obj = null)
-        {
-            using (StreamWriter sw = File.AppendText("Transaction.log"))
-            {
-                int sum = 0;
-                foreach (var item in TransactionList)
+        {          
+                using (StreamWriter sw = File.AppendText("Transaction.log"))
                 {
-                    sum += item.MoneyPaid;
+                    int sum = 0;
+                lock(transactionListMonitor)
+                {
+                    foreach (var item in TransactionList)
+                    {
+                        sum += item.MoneyPaid;
+                    }
                 }
-                sw.WriteLine(String.Format("{0} \t \t sum: {1}", DateTime.Now, sum));
-            }
-            TransactionList.Clear();
+                    
+                    sw.WriteLine(String.Format("{0} \t \t sum: {1}", DateTime.Now, sum));
+                }
+                lock(transactionListMonitor)
+                {
+                TransactionList.Clear();
+                }                          
         }
 
         public void StartDay()
