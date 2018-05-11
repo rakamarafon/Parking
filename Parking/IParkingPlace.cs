@@ -15,6 +15,7 @@ namespace Parking
         List<Transaction> GetTransactionsByLastMinute();
         int GetFreeSpaceOnParking();
         void SaveTransactionToFile(object obj);
+        List<string> GetTransactionsFromFile();
         void StartDay();
         int GetBusySpaceOnParking();
         int TotalParkingProfit();

@@ -22,8 +22,18 @@ namespace Parking
             Success,
             NoCar
         }
+
+        public int ParkingSpace { get; private set; }
+        public int Fine { get; private set; }
+        public int Timeout { get; private set; }
+        public readonly Dictionary<CarType, int> priceDictionary;
+
         private Parking()
         {
+            ParkingSpace = Settings.ParkingSpace;
+            Fine = Settings.Fine;
+            Timeout = Settings.Timeout;
+            priceDictionary = Settings.priceDictionary;
             CarList = new List<Car>();
             TransactionList = new List<Transaction>();
         } 
@@ -51,19 +61,19 @@ namespace Parking
                 if (car.Balance < price)
                 {
                     int temp = price - car.Balance;
-                    return (temp * Settings.Fine) + price;
+                    return (temp * Fine) + price;
                 }
                 return price;
             }
             else
             {
-                return price * Settings.Fine;
+                return price * Fine;
             }
         }
         private void WriteOffByCar(ref Car car)
         {
             int price = 0;
-            foreach (var item in Settings.priceDictionary)
+            foreach (var item in priceDictionary)
             {
                 if (item.Key == car.Type) price = item.Value;
             }
@@ -134,7 +144,7 @@ namespace Parking
 
         public int GetFreeSpaceOnParking()
         {
-            return Settings.ParkingSpace - CarList.Count;
+            return ParkingSpace - CarList.Count;
         }
 
         public void SaveTransactionToFile(object obj = null)
@@ -146,8 +156,7 @@ namespace Parking
                 {
                     sum += item.MoneyPaid;
                 }
-                sw.WriteLine("Date \t \t \t \tSumm ");
-                sw.WriteLine(String.Format("{0} \t \t {1}", DateTime.Now, sum));
+                sw.WriteLine(String.Format("{0} \t \t sum: {1}", DateTime.Now, sum));
             }
             TransactionList.Clear();
         }
@@ -157,7 +166,7 @@ namespace Parking
             TimerCallback writteOffCallback = new TimerCallback(WriteOff);
             TimerCallback SaveToFileCallback = new TimerCallback(SaveTransactionToFile);
 
-            Timer timerWritteOff = new Timer(writteOffCallback, null,1000 * Settings.Timeout,1000 * Settings.Timeout);
+            Timer timerWritteOff = new Timer(writteOffCallback, null,1000 * Timeout,1000 * Timeout);
             Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 60 * 1000, 60 * 1000);
         }
 
@@ -165,6 +174,22 @@ namespace Parking
 
         public int TotalParkingProfit() => Balance;
 
-        public int ParkingProfitByLastMinute() => TransactionList.Sum(x => x.MoneyPaid);  
+        public int ParkingProfitByLastMinute() => TransactionList.Sum(x => x.MoneyPaid);
+
+        public List<string> GetTransactionsFromFile()
+        {
+            List<string> logs = new List<string>();
+            if (!File.Exists("Transaction.log")) return null;
+            using (StreamReader reader = new StreamReader(@"Transaction.log"))
+            {
+                while (true)
+                {
+                    string temp = reader.ReadLine();
+                    if (temp == null) break;
+                    logs.Add(temp);
+                }
+            }
+            return logs;
+        }
     }
 }

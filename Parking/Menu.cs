@@ -11,6 +11,10 @@ namespace Parking
     {
         private readonly string MSG_FOR_ID = "ID";
         private readonly string MSG_FOR_BALANCE = "balance";
+        private void PrintLongLine(int count = 100)
+        {
+            Console.WriteLine(new string('-', count));
+        }
         private void IncorectInput()
         {
             Console.Clear();
@@ -101,7 +105,7 @@ namespace Parking
         private void RemoveCar()
         {
             Console.Clear();
-            if(Parking.Instance.GetFreeSpaceOnParking() == Settings.ParkingSpace)
+            if(Parking.Instance.GetFreeSpaceOnParking() == Parking.Instance.ParkingSpace)
             {
                 Console.WriteLine("There are no cars on the parking place");
                 return;
@@ -148,12 +152,12 @@ namespace Parking
             {
                 Console.WriteLine("CarId: {0}\tCarBalance: {1}\tCarType: {2}", item.CarId, item.Balance, item.Type);
             }
-            Console.WriteLine(new string('-',100));
+            PrintLongLine();
         }
         private void AddBalanceForCar()
         {
             Console.Clear();
-            if (Parking.Instance.GetFreeSpaceOnParking() == Settings.ParkingSpace)
+            if (Parking.Instance.GetFreeSpaceOnParking() == Parking.Instance.ParkingSpace)
             {
                 Console.WriteLine("There are no cars on the parking place");
                 return;
@@ -243,6 +247,25 @@ namespace Parking
             Console.Clear();
             Console.WriteLine("There are {0} busy place on parking", Parking.Instance.GetBusySpaceOnParking());
         }
+        private void ShowTransactionLogFromFile()
+        {
+            Console.Clear();
+            var list = Parking.Instance.GetTransactionsFromFile();
+            if(list != null)
+            {
+                foreach (var item in list)
+                {
+                    Console.WriteLine(item);
+                }
+                PrintLongLine();
+            }  
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("The transaction file is not available\nLet's try again later");
+                Console.ResetColor();
+            }
+        }
         public void ShowMainMenu()
         {
             while (true)
@@ -256,6 +279,7 @@ namespace Parking
                 Console.WriteLine("7 - show log for last minute");
                 Console.WriteLine("8 - total parking income");
                 Console.WriteLine("9 - parking income by last minute");
+                Console.WriteLine("h - history from Transaction.log");
                 Console.WriteLine("q - Exit");
 
                 var input = Console.ReadKey();
@@ -263,8 +287,8 @@ namespace Parking
                 {
                     case '1':
                         Car car = AddNewCar();
-                        if (Parking.Instance.AddCar(car)) Console.WriteLine("car {0} was successfuly added", car.CarId);
-                        else Console.WriteLine("Car already in the parking lot");                              
+                        if (Parking.Instance.AddCar(car)) Console.WriteLine("car with ID:{0} was successfuly added", car.CarId);
+                            else Console.WriteLine("Car already in the parking lot");                              
                         break;
                     case '2':
                         RemoveCar();
@@ -289,6 +313,9 @@ namespace Parking
                         break;
                     case '9':
                         ShowParkingIncomeByLastMinute();
+                        break;
+                    case 'h':
+                        ShowTransactionLogFromFile();
                         break;
                     case 'q':
                         if(BeSureBeforeExit()) Environment.Exit(0);
