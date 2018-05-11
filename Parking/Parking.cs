@@ -169,8 +169,7 @@ namespace Parking
             catch (ArgumentException ae) { Console.WriteLine(ae.Message); }
             catch (PathTooLongException ptle) { Console.WriteLine(ptle.Message); }
             catch (DirectoryNotFoundException dnfe) { Console.WriteLine(dnfe.Message); }
-            catch (NotSupportedException nse) { Console.WriteLine(nse.Message); }
-                                    
+            catch (NotSupportedException nse) { Console.WriteLine(nse.Message); }                                   
         }
 
         public void StartDay()
@@ -192,15 +191,44 @@ namespace Parking
         {
             List<string> logs = new List<string>();
             if (!File.Exists("Transaction.log")) return null;
-            using (StreamReader reader = new StreamReader(LOG_FILE_NAME))
+            try
             {
-                while (true)
+                using (StreamReader reader = new StreamReader(LOG_FILE_NAME))
                 {
-                    string temp = reader.ReadLine();
-                    if (temp == null) break;
-                    logs.Add(temp);
+                    while (true)
+                    {
+                        string temp = reader.ReadLine();
+                        if (temp == null) break;
+                        logs.Add(temp);
+                    }
                 }
             }
+            catch(ArgumentNullException ane)
+            {
+                Console.WriteLine(ane.Message);
+                return null;
+            }
+            catch(ArgumentException ae)
+            {
+                Console.WriteLine(ae.Message);
+                return null;
+            }
+            catch(FileNotFoundException fnfe)
+            {
+                Console.WriteLine(fnfe.Message);
+                return null;
+            }
+            catch(DirectoryNotFoundException dnfe)
+            {
+                Console.WriteLine(dnfe.Message);
+                return null;
+            }
+            catch(IOException ioe)
+            {
+                Console.WriteLine(ioe.Message);
+                return null;
+            }
+            
             return logs;
         }
     }
