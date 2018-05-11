@@ -108,8 +108,14 @@ namespace Parking
                     break;
             }
 
-            Console.WriteLine("input car id");
-            string input_id = Console.ReadLine();           
+            Console.WriteLine("input car id\nb - back to main menu");
+            Console.Write("Car ID:\t");
+            string input_id = Console.ReadLine();
+            if (input_id == "b")
+            {
+                Console.Clear();
+                return null;
+            }
             int id;
 
             if (Int32.TryParse(input_id, out id))
@@ -122,8 +128,14 @@ namespace Parking
                 return null;
             }
             Console.Clear();
-            Console.WriteLine("input car balance");
+            Console.WriteLine("input car balance\nb - back to main menu");
+            Console.Write("Car Balance:\t");
             string input_balance = Console.ReadLine();
+            if (input_balance == "b")
+            {
+                Console.Clear();
+                return null;
+            }
             int balance;
             if (Int32.TryParse(input_balance, out balance))
             {
@@ -200,7 +212,11 @@ namespace Parking
             }
             Console.WriteLine("Please enter car ID (click 'b' for back)");
             string input = Console.ReadLine();
-            if (input == "b") return;
+            if (input == "b")
+            {
+                Console.Clear();
+                return;
+            }
             int id;
             Console.Clear();
             if (!Int32.TryParse(input, out id))
