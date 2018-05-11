@@ -27,6 +27,7 @@ namespace Parking
             ParkingHasCarWthThisID,
             Error
         }
+        private readonly string LOG_FILE_NAME = "Transaction.log";
 
         public int ParkingSpace { get; private set; }
         public int Fine { get; private set; }
@@ -45,18 +46,7 @@ namespace Parking
 
         private Car GetCarById(int id)
         {
-            try
-            {
-                return CarList.Single<Car>(x => x.CarId == id);
-            }
-            catch (ArgumentNullException)
-            {
-                return null;
-            }
-            catch(InvalidOperationException)
-            {
-                return null;
-            }
+          return CarList.FirstOrDefault<Car>(x => x.CarId == id);
         }
 
         private int CalculatePrice(ref Car car, int price)
@@ -156,24 +146,31 @@ namespace Parking
         }
 
         public void SaveTransactionToFile(object obj = null)
-        {          
-                using (StreamWriter sw = File.AppendText("Transaction.log"))
+        {
+            int sum = 0;
+            lock (transactionListMonitor)
+            {
+                foreach (var item in TransactionList)
                 {
-                    int sum = 0;
-                lock(transactionListMonitor)
-                {
-                    foreach (var item in TransactionList)
-                    {
-                        sum += item.MoneyPaid;
-                    }
+                    sum += item.MoneyPaid;
                 }
-                    
+                TransactionList.Clear();
+            }
+            try
+            {
+                using (StreamWriter sw = File.AppendText(LOG_FILE_NAME))
+                {
+
                     sw.WriteLine(String.Format("{0} \t \t sum: {1}", DateTime.Now, sum));
                 }
-                lock(transactionListMonitor)
-                {
-                TransactionList.Clear();
-                }                          
+            }
+            catch (UnauthorizedAccessException uae) { Console.WriteLine(uae.Message); }
+            catch (ArgumentNullException ane) { Console.WriteLine(ane.Message); }
+            catch (ArgumentException ae) { Console.WriteLine(ae.Message); }
+            catch (PathTooLongException ptle) { Console.WriteLine(ptle.Message); }
+            catch (DirectoryNotFoundException dnfe) { Console.WriteLine(dnfe.Message); }
+            catch (NotSupportedException nse) { Console.WriteLine(nse.Message); }
+                                    
         }
 
         public void StartDay()
@@ -195,7 +192,7 @@ namespace Parking
         {
             List<string> logs = new List<string>();
             if (!File.Exists("Transaction.log")) return null;
-            using (StreamReader reader = new StreamReader(@"Transaction.log"))
+            using (StreamReader reader = new StreamReader(LOG_FILE_NAME))
             {
                 while (true)
                 {
