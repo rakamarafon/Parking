@@ -8,7 +8,7 @@ namespace Parking
 {
     public interface IParkingPlace
     {
-        void AddCar(Car car);
+        bool AddCar(Car car);
         int RemoveCar(int car_id);
         void RefillCarBalance(int car_id, int sum_to_refill);
         void WriteOff(object obj);
@@ -17,5 +17,7 @@ namespace Parking
         void SaveTransactionToFile(object obj);
         void StartDay();
         int GetBusySpaceOnParking();
+        int TotalParkingProfit();
+        int ParkingProfitByLastMinute();
     }
 }

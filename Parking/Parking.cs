@@ -15,7 +15,13 @@ namespace Parking
         public List<Car> CarList { get; set; }
         public List<Transaction> TransactionList { get; set; }
         public int Balance { get; set; }
-
+        private enum ErrorsCod
+        {
+            EmptyList,
+            MinusBalance,
+            Success,
+            NoCar
+        }
         private Parking()
         {
             CarList = new List<Car>();
@@ -24,7 +30,18 @@ namespace Parking
 
         private Car GetCarById(int id)
         {
-            return CarList.Single<Car>(x => x.CarId == id);
+            try
+            {
+                return CarList.Single<Car>(x => x.CarId == id);
+            }
+            catch (ArgumentNullException)
+            {
+                return null;
+            }
+            catch(InvalidOperationException)
+            {
+                return null;
+            }
         }
 
         private int CalculatePrice(ref Car car, int price)
@@ -55,23 +72,33 @@ namespace Parking
             Balance += price;
         }
 
-        public void AddCar(Car car)
+        public bool AddCar(Car car)
         {
-            CarList.Add(car);
+            if (car != null)
+            {
+                foreach (var item in CarList)
+                {
+                    if (item.CarId == car.CarId) return false;
+                }
+                CarList.Add(car);
+                return true;
+            }
+            return false;
         }
 
         public int RemoveCar(int car_id)
         {
-            if (CarList.Count == 0) return 0;
+            if (CarList.Count == 0) return (int)ErrorsCod.EmptyList;
             Car car = GetCarById(car_id);
+            if (car == null) return (int)ErrorsCod.NoCar;
             if(car.Balance < 0)
             {
-                return 1;
+                return (int) ErrorsCod.MinusBalance;
             }
             else
             {
                 CarList.Remove(car);
-                return 2;
+                return (int)ErrorsCod.Success;
             }            
         }
 
@@ -134,9 +161,10 @@ namespace Parking
             Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 60 * 1000, 60 * 1000);
         }
 
-        public int GetBusySpaceOnParking()
-        {
-            return CarList.Count;
-        }
+        public int GetBusySpaceOnParking() => CarList.Count;
+
+        public int TotalParkingProfit() => Balance;
+
+        public int ParkingProfitByLastMinute() => TransactionList.Sum(x => x.MoneyPaid);  
     }
 }
