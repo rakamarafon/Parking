@@ -16,5 +16,6 @@ namespace Parking
         int GetFreeSpaceOnParking();
         void SaveTransactionToFile(object obj);
         void StartDay();
+        int GetBusySpaceOnParking();
     }
 }

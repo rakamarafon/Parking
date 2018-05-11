@@ -133,5 +133,10 @@ namespace Parking
             Timer timerWritteOff = new Timer(writteOffCallback, null,1000 * Settings.Timeout,1000 * Settings.Timeout);
             Timer timerSaveToFile = new Timer(SaveToFileCallback, null, 60 * 1000, 60 * 1000);
         }
+
+        public int GetBusySpaceOnParking()
+        {
+            return CarList.Count;
+        }
     }
 }

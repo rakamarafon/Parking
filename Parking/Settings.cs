@@ -8,11 +8,11 @@ namespace Parking
 {
     public static class Settings
     {
-        public static int Timeout { get; set; }
+        public static int Timeout { get; private set; }
 
-        public static Dictionary<CarType, int> priceDictionary;
-        public static int ParkingSpace { get; set; }
-        public static int Fine { get; set; }
+        public readonly static Dictionary<CarType, int> priceDictionary;
+        public static int ParkingSpace { get; private set; }
+        public static int Fine { get; private set; }
 
         static Settings()
         {
